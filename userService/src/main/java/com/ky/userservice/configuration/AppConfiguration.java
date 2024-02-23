@@ -1,5 +1,7 @@
 package com.ky.userservice.configuration;
 
+import com.ky.userservice.model.User;
+import com.ky.userservice.model.UserPrincipal;
 import com.ky.userservice.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,9 +26,11 @@ public class AppConfiguration {
     @Bean
     public UserDetailsService userDetailsService(){
 
-        return username -> (UserDetails) userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username could not found."));
-    }
+        return username -> {
+            User user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("Username could not be found."));
+            return new UserPrincipal(user);
+        };  }
 
     @Bean
     public AuthenticationProvider authenticationProvider(){
