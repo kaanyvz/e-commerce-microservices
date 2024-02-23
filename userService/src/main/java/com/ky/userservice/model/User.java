@@ -33,5 +33,7 @@ public class User {
     private Role role;
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
+    private boolean isEnabled;
+    private boolean isNotLocked;
 
 }

@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Date;
@@ -51,7 +52,10 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
-                .createdDate(new Date(System.currentTimeMillis()))
+                .createdDate(new Date())
+//                .profileImage("default")
+                .isEnabled(true)
+                .isNotLocked(true)
                 .build();
         UserPrincipal userPrincipal = new UserPrincipal(user);
         var savedUser = userRepository.save(user);
@@ -139,5 +143,8 @@ public class AuthenticationService {
 
     private boolean isMailAlreadyPresent(String mail){
         return userRepository.existsByEmail(mail);
+    }
+    private String putTemporarilyImage(String email){
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/image/profile" + email).toUriString();
     }
 }

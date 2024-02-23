@@ -1,5 +1,6 @@
 package com.ky.userservice.service.security;
 
+import com.ky.userservice.model.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -41,8 +42,17 @@ public class JWTService {
     }
 
     public String generateToken(UserDetails userDetails){
-        return generateToken(new HashMap<>(), userDetails);
+        UserPrincipal userPrincipal = (UserPrincipal) userDetails;
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("firstname", userPrincipal.getFirstName());
+        claims.put("lastname", userPrincipal.getLastName());
+//        claims.put("profileImgUrl", userPrincipal.getProfileImage());
+        claims.put("email", userPrincipal.getEmail());
+        claims.put("userId", userPrincipal.getUserId());
+
+        return buildToken(claims, userDetails, jwtExpiration);
     }
+
 
     public String generateRefreshToken(UserDetails userDetails){
 
@@ -65,7 +75,6 @@ public class JWTService {
                 .getBody();
     }
 
-    //todo - change userDetails with userPrincipal and add some extra claims with using maps.
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration){
         return Jwts
                 .builder()
@@ -91,3 +100,7 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
+
+
+
+//todo - change userDetails with userPrincipal and add some extra claims with using maps.

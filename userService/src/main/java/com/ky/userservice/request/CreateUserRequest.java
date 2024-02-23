@@ -16,5 +16,7 @@ public class CreateUserRequest {
     @NotNull
     private String password;
     private Role role;
+    private boolean isNonLocked;
+    private boolean isEnabled;
     private MultipartFile profileImage;
 }
