@@ -1,6 +1,7 @@
 package com.ky.userservice.service.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ky.userservice.enumeration.Role;
 import com.ky.userservice.model.Token;
 import com.ky.userservice.model.User;
 import com.ky.userservice.model.UserPrincipal;
@@ -49,7 +50,7 @@ public class AuthenticationService {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .role(Role.USER)
                 .createdDate(new Date(System.currentTimeMillis()))
                 .build();
         UserPrincipal userPrincipal = new UserPrincipal(user);
