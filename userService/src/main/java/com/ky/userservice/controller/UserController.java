@@ -1,16 +1,16 @@
 package com.ky.userservice.controller;
 
+import com.ky.userservice.dto.UserDto;
+import com.ky.userservice.model.User;
 import com.ky.userservice.request.LoginRequest;
 import com.ky.userservice.request.RegisterRequest;
 import com.ky.userservice.response.AuthenticationResponse;
+import com.ky.userservice.service.UserService;
 import com.ky.userservice.service.security.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -18,9 +18,16 @@ import java.io.IOException;
 @RequestMapping("/v1/auth")
 public class UserController {
     private final AuthenticationService authenticationService;
+    private final UserService userService;
 
-    public UserController(AuthenticationService authenticationService) {
+    public UserController(AuthenticationService authenticationService, UserService userService) {
         this.authenticationService = authenticationService;
+        this.userService = userService;
+    }
+
+    @GetMapping("/user/{email}")
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email){
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     @PostMapping("/register")
@@ -39,4 +46,6 @@ public class UserController {
         authenticationService.refreshToken(request, response);
 
     }
+
+
 }

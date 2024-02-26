@@ -25,6 +25,8 @@ public class User {
     private String lastName;
     private String password;
     private String email;
+
+    @Column(length = 1000)
     private String profileImage;
     private Date lastLogin;
     private Date lastLoginShow;

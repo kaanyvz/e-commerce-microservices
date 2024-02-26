@@ -2,6 +2,7 @@ package com.ky.userservice.service.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ky.userservice.enumeration.Role;
+import com.ky.userservice.enumeration.TokenType;
 import com.ky.userservice.model.Token;
 import com.ky.userservice.model.User;
 import com.ky.userservice.model.UserPrincipal;
@@ -53,7 +54,7 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .createdDate(new Date())
-//                .profileImage("default")
+                .profileImage(putTemporarilyImage(request.getEmail()))
                 .isEnabled(true)
                 .isNotLocked(true)
                 .build();
@@ -123,6 +124,7 @@ public class AuthenticationService {
         var token = Token.builder()
                 .user(user)
                 .token(jwtToken)
+                .tokenType(TokenType.BEARER)
                 .revoked(false)
                 .expired(false)
                 .build();

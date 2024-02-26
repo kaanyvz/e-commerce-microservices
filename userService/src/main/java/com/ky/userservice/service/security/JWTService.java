@@ -46,7 +46,7 @@ public class JWTService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("firstname", userPrincipal.getFirstName());
         claims.put("lastname", userPrincipal.getLastName());
-//        claims.put("profileImgUrl", userPrincipal.getProfileImage());
+        claims.put("profileImgUrl", userPrincipal.getProfileImage());
         claims.put("email", userPrincipal.getEmail());
         claims.put("userId", userPrincipal.getUserId());
 

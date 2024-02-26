@@ -57,6 +57,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public UserDto getUserByEmail(String email){
+        User user = userRepository.findUserByEmail(email);
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getEmail())
+                .lastName(user.getLastName())
+                .firstName(user.getFirstName())
+                .profileImage(user.getProfileImage())
+                .build();
+    }
+
     //todo
 //    public Me getMe(String token){
 //        Base64.getDecoder().decode(token);
