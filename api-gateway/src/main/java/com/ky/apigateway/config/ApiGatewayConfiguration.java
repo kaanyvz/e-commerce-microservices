@@ -20,6 +20,9 @@ public class ApiGatewayConfiguration {
                 .route("userService", r -> r.path("/v1/auth/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://userService"))
+                .route("userService", r -> r.path("/v1/user/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://userService"))
                 .build();
     }
 }

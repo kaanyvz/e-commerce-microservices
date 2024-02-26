@@ -49,6 +49,7 @@ public class JWTService {
         claims.put("profileImgUrl", userPrincipal.getProfileImage());
         claims.put("email", userPrincipal.getEmail());
         claims.put("userId", userPrincipal.getUserId());
+        claims.put("authorities", userPrincipal.getAuthorities());
 
         return buildToken(claims, userDetails, jwtExpiration);
     }
@@ -99,6 +100,7 @@ public class JWTService {
         byte[] keyBytes = Decoders.BASE64URL.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
 }
 
 

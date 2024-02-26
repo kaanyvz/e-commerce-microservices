@@ -48,18 +48,19 @@ public class AuthenticationService {
         this.userMapper = userMapper;
     }
 
-//    public AuthenticationResponse register(RegisterRequest request){
-//        if(isMailAlreadyPresent(request.getEmail())){
-//            throw new RuntimeException("Email Has already used before in this system.." + request.getEmail());
+//    public String saveAdmin(){
+//        String email = "admin@gmail.com";
+//        if(isMailAlreadyPresent(email)){
+//            throw new RuntimeException("Email Has already used before in this system.." + email);
 //        }
 //        var user = User.builder()
-//                .firstName(request.getFirstName())
-//                .lastName(request.getLastName())
-//                .email(request.getEmail())
-//                .password(passwordEncoder.encode(request.getPassword()))
-//                .role(Role.USER)
+//                .firstName("ADMIN")
+//                .lastName("ADMIN")
+//                .email(email)
+//                .password(passwordEncoder.encode("1233"))
+//                .role(Role.ADMIN)
 //                .createdDate(new Date())
-//                .profileImage(putTemporarilyImage(request.getEmail()))
+//                .profileImage(putTemporarilyImage("NO_IMAGE"))
 //                .isEnabled(true)
 //                .isNotLocked(true)
 //                .build();
@@ -69,33 +70,30 @@ public class AuthenticationService {
 //        var refreshToken = jwtService.generateRefreshToken(userPrincipal);
 //        saveUserToken(savedUser, jwtToken);
 //
-//        return AuthenticationResponse
-//                .builder()
-//                .accessToken(jwtToken)
-//                .refreshToken(refreshToken)
-//                .build();
+//        return "ADMIN HAS CREATED.";
 //
 //    }
-public UserDto register(RegisterRequest request){
-    if(isMailAlreadyPresent(request.getEmail())){
-        throw new EmailDuplicationError("This email has already used before in this system => " + request.getEmail());
+
+    public UserDto register(RegisterRequest request){
+        if(isMailAlreadyPresent(request.getEmail())){
+            throw new EmailDuplicationError("This email has already used before in this system => " + request.getEmail());
+        }
+        var user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
+                .createdDate(new Date())
+                .profileImage(putTemporarilyImage(request.getEmail()))
+                .isEnabled(true)
+                .isNotLocked(true)
+                .build();
+
+        User savedUser = userRepository.save(user);
+        return userMapper.userToUserDto(savedUser);
+
     }
-    var user = User.builder()
-            .firstName(request.getFirstName())
-            .lastName(request.getLastName())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .role(Role.USER)
-            .createdDate(new Date())
-            .profileImage(putTemporarilyImage(request.getEmail()))
-            .isEnabled(true)
-            .isNotLocked(true)
-            .build();
-
-    User savedUser = userRepository.save(user);
-    return userMapper.userToUserDto(savedUser);
-
-}
 
     public AuthenticationResponse login(LoginRequest loginRequest){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -174,4 +172,5 @@ public UserDto register(RegisterRequest request){
     private String putTemporarilyImage(String email){
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/image/profile" + email).toUriString();
     }
+
 }
