@@ -15,37 +15,17 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("/v1/user")
 public class UserController {
-    private final AuthenticationService authenticationService;
     private final UserService userService;
 
-    public UserController(AuthenticationService authenticationService, UserService userService) {
-        this.authenticationService = authenticationService;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping("/user/{email}")
+    @GetMapping("/getByEmail/{email}")
     public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email){
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
-
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request){
-        return ResponseEntity.ok(authenticationService.register(request));
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest){
-        return ResponseEntity.ok(authenticationService.login(loginRequest));
-    }
-
-    @PostMapping("/refresh-token")
-    public void refreshToken(HttpServletRequest request,
-                             HttpServletResponse response) throws IOException {
-        authenticationService.refreshToken(request, response);
-
-    }
-
 
 }

@@ -1,8 +1,11 @@
 package com.ky.userservice.service.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ky.userservice.dto.UserDto;
 import com.ky.userservice.enumeration.Role;
 import com.ky.userservice.enumeration.TokenType;
+import com.ky.userservice.exc.EmailDuplicationError;
+import com.ky.userservice.mapper.UserMapper;
 import com.ky.userservice.model.Token;
 import com.ky.userservice.model.User;
 import com.ky.userservice.model.UserPrincipal;
@@ -30,47 +33,69 @@ public class AuthenticationService {
     private final JWTService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     public AuthenticationService(UserRepository userRepository,
                                  TokenRepository tokenRepository,
                                  JWTService jwtService,
                                  AuthenticationManager authenticationManager,
-                                 PasswordEncoder passwordEncoder) {
+                                 PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
-    public AuthenticationResponse register(RegisterRequest request){
-        if(isMailAlreadyPresent(request.getEmail())){
-            throw new RuntimeException("Email Has already used before in this system.." + request.getEmail());
-        }
-        var user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .createdDate(new Date())
-                .profileImage(putTemporarilyImage(request.getEmail()))
-                .isEnabled(true)
-                .isNotLocked(true)
-                .build();
-        UserPrincipal userPrincipal = new UserPrincipal(user);
-        var savedUser = userRepository.save(user);
-        var jwtToken = jwtService.generateToken(userPrincipal);
-        var refreshToken = jwtService.generateRefreshToken(userPrincipal);
-        saveUserToken(savedUser, jwtToken);
-
-        return AuthenticationResponse
-                .builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
-
+//    public AuthenticationResponse register(RegisterRequest request){
+//        if(isMailAlreadyPresent(request.getEmail())){
+//            throw new RuntimeException("Email Has already used before in this system.." + request.getEmail());
+//        }
+//        var user = User.builder()
+//                .firstName(request.getFirstName())
+//                .lastName(request.getLastName())
+//                .email(request.getEmail())
+//                .password(passwordEncoder.encode(request.getPassword()))
+//                .role(Role.USER)
+//                .createdDate(new Date())
+//                .profileImage(putTemporarilyImage(request.getEmail()))
+//                .isEnabled(true)
+//                .isNotLocked(true)
+//                .build();
+//        UserPrincipal userPrincipal = new UserPrincipal(user);
+//        var savedUser = userRepository.save(user);
+//        var jwtToken = jwtService.generateToken(userPrincipal);
+//        var refreshToken = jwtService.generateRefreshToken(userPrincipal);
+//        saveUserToken(savedUser, jwtToken);
+//
+//        return AuthenticationResponse
+//                .builder()
+//                .accessToken(jwtToken)
+//                .refreshToken(refreshToken)
+//                .build();
+//
+//    }
+public UserDto register(RegisterRequest request){
+    if(isMailAlreadyPresent(request.getEmail())){
+        throw new EmailDuplicationError("This email has already used before in this system => " + request.getEmail());
     }
+    var user = User.builder()
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .role(Role.USER)
+            .createdDate(new Date())
+            .profileImage(putTemporarilyImage(request.getEmail()))
+            .isEnabled(true)
+            .isNotLocked(true)
+            .build();
+
+    User savedUser = userRepository.save(user);
+    return userMapper.userToUserDto(savedUser);
+
+}
 
     public AuthenticationResponse login(LoginRequest loginRequest){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(

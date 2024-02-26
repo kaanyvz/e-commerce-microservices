@@ -1,6 +1,5 @@
 package com.ky.userservice.service;
 
-import com.ky.userservice.dto.Me;
 import com.ky.userservice.dto.UserDto;
 import com.ky.userservice.model.User;
 import com.ky.userservice.repository.UserRepository;
@@ -12,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
 
