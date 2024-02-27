@@ -41,6 +41,11 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
         return createHttpResponse(HttpStatus.CONFLICT, exception.getMessage());
     }
 
+    @ExceptionHandler(PasswordMatchException.class)
+    public ResponseEntity<HttpResponse> passwordsDidNotMatchException(PasswordMatchException exception){
+        return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
 
     // PRIVATE METHODS //
     private ResponseEntity<HttpResponse> createHttpResponse(HttpStatus httpStatus, String message){

@@ -1,24 +1,32 @@
 package com.ky.userservice.service;
 
+import com.ky.userservice.dto.Me;
+import com.ky.userservice.dto.UserCredential;
 import com.ky.userservice.dto.UserDto;
+import com.ky.userservice.enumeration.Role;
+import com.ky.userservice.exc.PasswordMatchException;
 import com.ky.userservice.model.User;
 import com.ky.userservice.repository.UserRepository;
 import com.ky.userservice.request.CreateUserRequest;
+import com.ky.userservice.request.UpdatePasswordRequest;
 import com.ky.userservice.request.UpdateUserRequest;
 import com.ky.userservice.service.security.JWTService;
 import com.ky.userservice.service.security.LoginService;
+import io.jsonwebtoken.Claims;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
+
     private final LoginService loginService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JWTService jwtService, LoginService loginService) {
@@ -55,6 +63,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User updatePassword(UpdatePasswordRequest request, String token){
+        Claims claims = jwtService.extractAllClaims(token);
+        String email = (String) claims.get("email");
+        User currentUser = findUserByEmail(email);
+
+        if(passwordEncoder.matches(request.getCurrentPassword(), currentUser.getPassword())){
+            currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }else{
+            throw new PasswordMatchException("Passwords did not match with each other");
+        }
+        return userRepository.save(currentUser);
+    }
+
     public UserDto getUserByEmail(String email){
         User user = userRepository.findUserByEmail(email);
         return UserDto.builder()
@@ -66,10 +87,32 @@ public class UserService {
                 .build();
     }
 
-    //todo
-//    public Me getMe(String token){
-//        Base64.getDecoder().decode(token);
-//    }
+    //todo - meFunc.
+    public Me getMe (String token){
+        Claims claims = jwtService.extractAllClaims(token);
+        Integer userId = (Integer)  claims.get("userId");
+        String firstName = (String) claims.get("firstname");
+        String lastName = (String) claims.get("lastname");
+        String profileImage = (String) claims.get("profileImgUrl");
+        String email = (String) claims.get("email");
+
+        List<String> authorityNames = ((List<Map<String, String>>) claims.get("authorities")).stream()
+                .map(m -> m.get("authority"))
+                .collect(Collectors.toList());
+
+        List<Role> roles = authorityNames.stream()
+                .map(authority -> Role.valueOf(authority.substring("ROLE_".length())))
+                .collect(Collectors.toList());
+
+        return new Me(
+                userId,
+                roles,
+                email,
+                firstName,
+                lastName,
+                profileImage
+        );
+    }
 
     //  PRIVATE METHODS  //
     private void isEmailAlreadyExists(String email){
@@ -79,12 +122,36 @@ public class UserService {
         }
     }
 
+    //todo - apply the if suggestion
+    private void validateLogin(User user){
+        if(user.isNotLocked()){
+            if(loginService.isExceededMaxAttempts(user.getEmail())){
+                user.setNotLocked(false);
+            }else{
+                user.setNotLocked(true);
+            }
+        }else {
+            loginService.removeLoginCache(user.getEmail());
+        }
+    }
+
+    private UserCredential getUserCredentials(Integer id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found."));
+        return new UserCredential(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail()
+        );
+    }
+
     private String putTemporarilyImage(String email){
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/image/profile" + email).toUriString();
     }
 
-    private String[] splitToken(String token){
-        return token.split("\\.");
+    private User findUserByEmail(String email){
+        return userRepository.findUserByEmail(email);
     }
 
 
