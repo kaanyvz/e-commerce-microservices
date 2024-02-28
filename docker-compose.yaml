@@ -15,3 +15,10 @@ services:
     environment:
       VAULT_ADDR: http://127.0.0.1:8200
     entrypoint: vault server -config=/vault/config/vault.json
+
+  rabbitmq:
+    image: rabbitmq:3.12.13-management-alpine
+    container_name: rabbitMQ
+    ports:
+      - "5672:5672"
+      - "15672:15672"

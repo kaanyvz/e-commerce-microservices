@@ -110,6 +110,14 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- RABBIT SERVICE -->
+        <dependency>
+            <groupId>com.ky</groupId>
+            <artifactId>rabbitService</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
     <dependencyManagement>
         <dependencies>

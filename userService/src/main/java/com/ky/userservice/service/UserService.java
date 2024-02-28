@@ -1,5 +1,7 @@
 package com.ky.userservice.service;
 
+import com.ky.rabbitservice.producer.MessageProducer;
+import com.ky.rabbitservice.request.EmailRequest;
 import com.ky.userservice.dto.Me;
 import com.ky.userservice.dto.UserCredential;
 import com.ky.userservice.dto.UserDto;
@@ -14,6 +16,7 @@ import com.ky.userservice.service.security.JWTService;
 import com.ky.userservice.service.security.LoginService;
 import io.jsonwebtoken.Claims;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,13 +29,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
-
+    private final MessageProducer messageProducer;
     private final LoginService loginService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JWTService jwtService, LoginService loginService) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JWTService jwtService,
+                       MessageProducer messageProducer,
+                       LoginService loginService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.messageProducer = messageProducer;
         this.loginService = loginService;
     }
 
@@ -76,6 +84,14 @@ public class UserService {
         return userRepository.save(currentUser);
     }
 
+    public void resetPassword(String email){
+        User user = findUserByEmail(email);
+        String password = RandomStringUtils.randomAlphanumeric(15);
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        sendMail(user, password);
+    }
+
     public UserDto getUserByEmail(String email){
         User user = userRepository.findUserByEmail(email);
         return UserDto.builder()
@@ -115,6 +131,18 @@ public class UserService {
     }
 
     //  PRIVATE METHODS  //
+
+    private void sendMail(User user, String password){
+        String message = "Hello" + user.getFirstName() + ", \n\n Your new password is: " + password;
+        String subject = "New Password";
+        EmailRequest emailRequest = new EmailRequest(message, user.getEmail(), subject);
+        messageProducer.publish(
+                emailRequest,
+                "notification.exchange",
+                "send.email.routing-key"
+        );
+    }
+
     private void isEmailAlreadyExists(String email){
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isPresent()){

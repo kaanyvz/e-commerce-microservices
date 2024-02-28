@@ -17,7 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.ky.rabbitservice",
+        "com.ky.userservice",
+    }
+)
 @EnableDiscoveryClient
 public class UserServiceApplication implements CommandLineRunner {
 
