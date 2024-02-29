@@ -27,14 +27,13 @@ public class RabbitConfig {
     @Bean
     public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(){
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
+        factory.setConnectionFactory(connectionFactory);    
         factory.setMessageConverter(jacksonConverter());
         return factory;
     }
 
     @Bean
     public MessageConverter jacksonConverter(){
-        MessageConverter messageConverter = new Jackson2JsonMessageConverter();
-        return messageConverter;
+        return new Jackson2JsonMessageConverter();
     }
 }
