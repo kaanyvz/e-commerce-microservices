@@ -38,4 +38,9 @@ public class User {
     private boolean isEnabled;
     private boolean isNotLocked;
 
+    // Establishing OneToOne relationship with File entity for profile image
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_image_id", referencedColumnName = "id")
+    private File profileImg;
+
 }

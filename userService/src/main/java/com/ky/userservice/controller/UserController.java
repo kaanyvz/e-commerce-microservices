@@ -9,9 +9,10 @@ import com.ky.userservice.service.UserService;
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -44,5 +45,19 @@ public class UserController {
                 "Your new Password has sent to you email"),
                 HttpStatus.OK);
     }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadImageToFIleSystem(@RequestPart("image") MultipartFile file,
+                                                          @RequestParam String email) {
+        return ResponseEntity.ok().body(userService.uploadImgToTheSystem(email, file));
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<?> downloadImageFromFileSystem(@PathVariable String id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("image/png"))
+                .body(userService.downloadImageFromFileSystem(id));
+    }
+
 
 }
