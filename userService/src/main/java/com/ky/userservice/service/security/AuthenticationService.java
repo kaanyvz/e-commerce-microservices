@@ -48,32 +48,6 @@ public class AuthenticationService {
         this.userMapper = userMapper;
     }
 
-//    public String saveAdmin(){
-//        String email = "admin@gmail.com";
-//        if(isMailAlreadyPresent(email)){
-//            throw new RuntimeException("Email Has already used before in this system.." + email);
-//        }
-//        var user = User.builder()
-//                .firstName("ADMIN")
-//                .lastName("ADMIN")
-//                .email(email)
-//                .password(passwordEncoder.encode("1233"))
-//                .role(Role.ADMIN)
-//                .createdDate(new Date())
-//                .profileImage(putTemporarilyImage("NO_IMAGE"))
-//                .isEnabled(true)
-//                .isNotLocked(true)
-//                .build();
-//        UserPrincipal userPrincipal = new UserPrincipal(user);
-//        var savedUser = userRepository.save(user);
-//        var jwtToken = jwtService.generateToken(userPrincipal);
-//        var refreshToken = jwtService.generateRefreshToken(userPrincipal);
-//        saveUserToken(savedUser, jwtToken);
-//
-//        return "ADMIN HAS CREATED.";
-//
-//    }
-
     public UserDto register(RegisterRequest request){
         if(isMailAlreadyPresent(request.getEmail())){
             throw new EmailDuplicationError("This email has already used before in this system => " + request.getEmail());
