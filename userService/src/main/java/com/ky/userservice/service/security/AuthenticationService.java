@@ -103,6 +103,9 @@ public class AuthenticationService {
         var user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User could not found..."));
 
+        user.setLastLoginShow(user.getLastLogin());
+        user.setLastLogin(new Date());
+
         UserPrincipal userPrincipal = new UserPrincipal(user);
         var jwtToken = jwtService.generateToken(userPrincipal);
         var refreshToken = jwtService.generateRefreshToken(userPrincipal);

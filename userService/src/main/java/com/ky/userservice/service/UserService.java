@@ -7,6 +7,7 @@ import com.ky.userservice.dto.UserCredential;
 import com.ky.userservice.dto.UserDto;
 import com.ky.userservice.enumeration.Role;
 import com.ky.userservice.exc.PasswordMatchException;
+import com.ky.userservice.mapper.UserMapper;
 import com.ky.userservice.model.File;
 import com.ky.userservice.model.User;
 import com.ky.userservice.repository.FileRepository;
@@ -21,7 +22,6 @@ import io.jsonwebtoken.Claims;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang.RandomStringUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +29,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,19 +42,21 @@ public class UserService {
     private final MessageProducer messageProducer;
     private final LoginService loginService;
     private final FileRepository fileRepository;
+    private final UserMapper userMapper;
     private String FOLDER_PATH;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        JWTService jwtService,
                        MessageProducer messageProducer,
-                       LoginService loginService, FileRepository fileRepository) {
+                       LoginService loginService, FileRepository fileRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.messageProducer = messageProducer;
         this.loginService = loginService;
         this.fileRepository = fileRepository;
+        this.userMapper = userMapper;
     }
 
     // only admin can use
@@ -103,14 +106,28 @@ public class UserService {
 
 
     //UPDATE METHODS//
-    public User updateUser(UpdateUserRequest request){
+    public UserDto updateUser(UpdateUserRequest request){
         User user = userRepository.findUserByEmail(request.getEmail());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setProfileImage(user.getProfileImage());
-        //todo - add more
-        return userRepository.save(user);
+        if (user == null) {
+            throw new RuntimeException("User not found with email: " + request.getEmail());
+        }
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+        if(request.getProfileImage() != null){
+            if (user.getProfileImage() != null) {
+                deleteImage(user.getProfileImg().getId());
+                fileRepository.deleteById(user.getProfileImg().getId());
+            }
+            uploadImgToTheSystem(user.getEmail(), request.getProfileImage());
+        }
+        User savedUser = userRepository.save(user);
+        return userMapper.userToUserDto(savedUser);
     }
+
     public User updatePassword(UpdatePasswordRequest request, String token){
         Claims claims = jwtService.extractAllClaims(token);
         String email = (String) claims.get("email");
@@ -126,7 +143,6 @@ public class UserService {
 
 
 
-    //PASSWORD METHODS
     public void resetPassword(String email){
         User user = findUserByEmail(email);
         String password = RandomStringUtils.randomAlphanumeric(15);
@@ -138,6 +154,7 @@ public class UserService {
         EmailRequest emailRequest = new EmailRequest(message, user.getEmail(), subject);
         sendMail(emailRequest);
     }
+
 
     public UserDto getUserByEmail(String email){
         User user = userRepository.findUserByEmail(email);
@@ -156,6 +173,7 @@ public class UserService {
         return "User has deleted successfully!";
     }
 
+    //PP METHODS
     protected File findFileById(String id){
         return fileRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Could not found by id.."));
@@ -212,9 +230,21 @@ public class UserService {
         }
     }
 
+    public String deleteImage(String id){
+        File file = findFileById(id);
+        if(file == null){
+            throw new RuntimeException("File could not found by id: " + id);
+        }
+        try {
+            Files.deleteIfExists(Paths.get(file.getFilePath()));
+        }catch (IOException exception){
+            throw new RuntimeException("Error while deleting the file: " + exception.getMessage());
+        }
+        return "File deleted successfully!";
+    }
+
 
     //  PRIVATE METHODS  //
-
     private void sendMail(EmailRequest emailRequest){
         messageProducer.publish(
                 emailRequest,

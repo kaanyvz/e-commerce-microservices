@@ -1,12 +1,14 @@
 package com.ky.userservice.request;
 
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
+@Setter
 public class UpdateUserRequest {
     private String email;
-    private String password;
     private String firstName;
-    private  String lastName;
-    private String profileImage;
+    private String lastName;
+    private MultipartFile profileImage;
 }
