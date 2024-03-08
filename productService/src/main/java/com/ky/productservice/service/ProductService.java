@@ -145,7 +145,6 @@ public class ProductService {
                 .unitPrice(product.getUnitPrice())
                 .imageUrl(product.getImageUrl())
                 .build();
-
         elasticRepository.save(productModel);
     }
 
