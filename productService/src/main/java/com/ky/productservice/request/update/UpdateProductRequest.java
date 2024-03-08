@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class UpdateProductRequest {
     private String newProductName;
     private String desc;
-    private Long categoryId;
+    private Integer categoryId;
     private BigDecimal price;
     private String imageUrl;
 }

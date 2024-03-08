@@ -1,14 +1,16 @@
 package com.ky.productservice.service;
 
-import com.ky.commons.model.UserCredential;
 import com.ky.productservice.dto.CommentDto;
 import com.ky.productservice.mapper.CommentMapper;
 import com.ky.productservice.model.Comment;
 import com.ky.productservice.model.Product;
 import com.ky.productservice.repository.CommentRepository;
 import com.ky.productservice.request.create.CreateCommentRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class CommentService {
@@ -22,18 +24,27 @@ public class CommentService {
         this.productService = productService;
     }
 
-    public CommentDto createComment(CreateCommentRequest request){
+    public CommentDto createComment(CreateCommentRequest request) {
         Product product = productService.getProductById(request.getProductId());
-        UserCredential userCredential =(UserCredential) SecurityContextHolder.getContext()
-                .getAuthentication().getCredentials();
 
-        Comment comment = Comment.builder()
-                .commentCreator(userCredential.getUsername())
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User is not authenticated.");
+        }
+
+        String username = authentication.getName();
+        if (username == null || username.isEmpty()) {
+            throw new IllegalStateException("Username is not available.");
+        }
+
+        Comment comment = Comment.commentBuilder()
+                .commentCreator(username)
                 .text(request.getCommentText())
                 .product(product)
                 .build();
-        Comment savedCom = commentRepository.save(comment);
-        return commentMapper.commentConverter(savedCom);
+        comment.setCreatedDate(LocalDateTime.now());
+        Comment savedComment = commentRepository.save(comment);
+        return commentMapper.commentConverter(savedComment);
     }
 
     public String deleteComment(Integer id){

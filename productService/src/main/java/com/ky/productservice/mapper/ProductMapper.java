@@ -21,6 +21,7 @@ public class ProductMapper {
                 .id(product.getId())
                 .name(product.getName())
                 .unitPrice(product.getUnitPrice())
+                .createdDate(product.getCreatedDate())
                 .desc(product.getDescription())
                 .imageUrl(product.getImageUrl())
                 .comments(product.getComments().stream().map(commentMapper::commentConverter).collect(Collectors.toList()))

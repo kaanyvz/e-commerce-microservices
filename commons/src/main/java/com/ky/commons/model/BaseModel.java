@@ -12,7 +12,6 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @SuperBuilder
 public class BaseModel {
 

@@ -1,8 +1,10 @@
 package com.ky.userservice.configuration;
 
+import com.ky.userservice.enumeration.Role;
 import com.ky.userservice.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -51,6 +53,11 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
+                                .requestMatchers("/v1/user/getByEmail/**").hasAnyRole(Role.ADMIN.name())
+                                .requestMatchers("/v1/user/createUser/").hasAnyRole(Role.ADMIN.name())
+                                .requestMatchers("v1/user/download/**").hasAnyRole(Role.ADMIN.name())
+                                .requestMatchers("/v1/user/updateUser").hasAnyRole(Role.ADMIN.name())
+
                                 .anyRequest()
                                 .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

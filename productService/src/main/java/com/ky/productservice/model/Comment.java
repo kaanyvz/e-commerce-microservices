@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "comments")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(builderMethodName = "commentBuilder")
 @Data
 public class Comment extends AdvanceBaseModel {
 

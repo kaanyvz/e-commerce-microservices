@@ -5,9 +5,11 @@ import com.ky.productservice.mapper.CategoryMapper;
 import com.ky.productservice.model.Category;
 import com.ky.productservice.repository.CategoryRepository;
 import com.ky.productservice.request.create.CreateCategoryRequest;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,11 +22,27 @@ public class CategoryService {
         this.categoryMapper = categoryMapper;
     }
 
-    public CategoryDto createCategory(CreateCategoryRequest request){
-        Category category = Category.builder()
-                .name(request.getCategoryName())
-                .build();
+    public Category getCategoryById(Integer id){
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Error"));
+    }
 
+    public CategoryDto createCategory(CreateCategoryRequest request) {
+        if (request == null || StringUtils.isBlank(request.getCategoryName())) {
+            throw new IllegalArgumentException("Category name is required.");
+        }
+
+        String categoryName = request.getCategoryName().toLowerCase();
+
+        // Check if the entered category already exists (case-insensitive)
+        Optional<Category> existingCategory = categoryRepository.findByNameIgnoreCase(categoryName);
+        if (existingCategory.isPresent()) {
+            throw new IllegalArgumentException("Category '" + categoryName + "' already exists.");
+        }
+
+        Category category = Category.builder()
+                .name(categoryName)
+                .build();
         Category savedCategory = categoryRepository.save(category);
 
         return categoryMapper.categoryConverter(savedCategory);
@@ -37,6 +55,7 @@ public class CategoryService {
 
     public String deleteCategory(String categoryName){
         Category category = categoryRepository.findByName(categoryName);
+        categoryRepository.delete(category);
         return "This category has been deleted successfully." + categoryName;
     }
 }

@@ -23,6 +23,15 @@ public class ApiGatewayConfiguration {
                 .route("userService", r -> r.path("/v1/user/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://userService"))
+                .route("productService", r ->r.path("/v1/products/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://productService"))
+                .route("productService", r ->r.path("/v1/categories/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://productService"))
+                .route("productService", r ->r.path("/v1/comments/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://productService"))
                 .build();
     }
 }

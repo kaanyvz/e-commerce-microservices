@@ -4,12 +4,13 @@ import com.ky.productservice.dto.CategoryDto;
 import com.ky.productservice.request.create.CreateCategoryRequest;
 import com.ky.productservice.service.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/category")
+@RequestMapping("/v1/categories")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -17,6 +18,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @PostMapping("/createCategory")
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CreateCategoryRequest request){
         return ResponseEntity.ok(categoryService.createCategory(request));
@@ -27,6 +29,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @DeleteMapping("/deleteCategory")
     public ResponseEntity<String> deleteCategory(@RequestParam String categoryName){
         return ResponseEntity.ok(categoryService.deleteCategory(categoryName));

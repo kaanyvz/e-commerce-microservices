@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 @Builder
 public record CommentDto(
         Integer id,
-        String createdBy,
         LocalDateTime createdDate,
         String text,
         String creator

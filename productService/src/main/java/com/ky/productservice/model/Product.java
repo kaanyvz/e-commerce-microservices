@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
+@Builder(builderMethodName = "productBuilder")
 public class Product extends AdvanceBaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +35,6 @@ public class Product extends AdvanceBaseModel {
     private Category category;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
 }

@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/comment")
+@RequestMapping("/v1/comments")
 public class CommentController {
     private final CommentService commentService;
 

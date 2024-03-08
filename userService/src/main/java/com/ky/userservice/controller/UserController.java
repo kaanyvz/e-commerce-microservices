@@ -6,12 +6,14 @@ import com.ky.userservice.dto.UserDto;
 import com.ky.userservice.exc.HttpResponse;
 import com.ky.userservice.model.User;
 import com.ky.userservice.model.UserPrincipal;
+import com.ky.userservice.request.CreateUserRequest;
 import com.ky.userservice.request.UpdatePasswordRequest;
 import com.ky.userservice.request.UpdateUserRequest;
 import com.ky.userservice.response.AuthenticationResponse;
 import com.ky.userservice.service.UserService;
 
 import com.ky.userservice.util.AuthenticationHelper;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.HttpStatus;
@@ -54,6 +56,7 @@ public class UserController {
                 HttpStatus.OK);
     }
 
+    //admin
     @GetMapping("/download/{id}")
     public ResponseEntity<?> downloadImageFromFileSystem(@PathVariable String id) {
         return ResponseEntity.ok()
@@ -105,6 +108,11 @@ public class UserController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    @PostMapping("/createUser")
+    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest request){
+        return ResponseEntity.ok(userService.createNewUser(request));
     }
 
 
