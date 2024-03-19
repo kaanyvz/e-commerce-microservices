@@ -13,6 +13,7 @@ public record ProdDto(
         BigDecimal unitPrice,
         String desc,
         String imageUrl,
+        Integer stockCount,
         List<CommentDto> comments,
         LocalDateTime createdDate
 ) {

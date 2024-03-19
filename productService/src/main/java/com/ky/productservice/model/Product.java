@@ -29,6 +29,7 @@ public class Product extends AdvanceBaseModel {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean hasDeleted;
     private String imageUrl;
+    private Integer stockCount;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

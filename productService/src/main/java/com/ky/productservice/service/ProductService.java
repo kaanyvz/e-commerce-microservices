@@ -63,6 +63,7 @@ public class ProductService {
                 .imageUrl(request.getImageUrl())
                 .description(request.getDesc())
                 .comments(new ArrayList<>())
+                .stockCount(request.getStockCount())
                 .build();
         product.setCreatedDate(LocalDateTime.now());
         Product savedProduct = productRepository.save(product);
@@ -118,6 +119,19 @@ public class ProductService {
 
     public List<ProdDto> getAll(){
         return productRepository.findAll().stream().map(productMapper::productConverter).collect(Collectors.toList());
+    }
+
+//    public String printIsInStock(Integer productId){
+//        if(isInStock(productId)){
+//            System.out.println("");
+//        }
+//
+//    }
+
+    public boolean isInStock(Integer productId){
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product cannot find by id."));
+        return product.getStockCount() > 0;
     }
 
     //PRIVATE METHODS

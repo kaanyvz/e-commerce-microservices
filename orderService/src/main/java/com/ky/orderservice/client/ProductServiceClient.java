@@ -14,4 +14,7 @@ public interface ProductServiceClient {
 
     @GetMapping("/{id}")
     ResponseEntity<ProdDto> getProdDtoById(@PathVariable Integer id);
+
+    @GetMapping("/isInStock/{id}")
+    ResponseEntity<Boolean> isInStock(@PathVariable Integer id);
 }
