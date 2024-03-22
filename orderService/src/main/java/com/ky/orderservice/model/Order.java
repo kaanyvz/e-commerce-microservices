@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Table
+@Table(name = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
+@Builder(builderMethodName = "orderBuilder")
 public class Order extends AdvanceBaseModel {
-    private Integer customerId;
+    private String customerMail;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;

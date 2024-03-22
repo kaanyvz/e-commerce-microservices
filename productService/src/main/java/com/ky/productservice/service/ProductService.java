@@ -121,17 +121,22 @@ public class ProductService {
         return productRepository.findAll().stream().map(productMapper::productConverter).collect(Collectors.toList());
     }
 
-//    public String printIsInStock(Integer productId){
-//        if(isInStock(productId)){
-//            System.out.println("");
-//        }
-//
-//    }
 
     public boolean isInStock(Integer productId){
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product cannot find by id."));
         return product.getStockCount() > 0;
+    }
+
+    public String reduceStock(Integer id, Integer qty){
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("product could not found"));
+        if(product.getStockCount() < 0){
+            throw new RuntimeException("Insufficient stock for product with id: " + id);
+        }
+        product.setStockCount(product.getStockCount() - qty);
+        productRepository.save(product);
+        return "Stock count has been updated.";
     }
 
     //PRIVATE METHODS

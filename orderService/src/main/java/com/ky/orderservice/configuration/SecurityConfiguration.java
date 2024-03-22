@@ -1,6 +1,6 @@
-package com.ky.productservice.configuration;
+package com.ky.orderservice.configuration;
 
-import com.ky.productservice.security.JwtAuthenticationFilter;
+import com.ky.orderservice.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -17,8 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter filter;
     private static final String[] WHITE_LIST_URL = {
-            "/v1/products/isInStock/**",
-            "/v1/products/reduceStock/**",
+
     };
 
     public SecurityConfiguration(JwtAuthenticationFilter filter) {

@@ -35,9 +35,16 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAll());
     }
 
+
     @GetMapping("/isInStock/{id}")
     public ResponseEntity<Boolean> isInStock(@PathVariable Integer id){
         return ResponseEntity.ok(productService.isInStock(id));
+    }
+
+    @GetMapping("/reduceStock/{id}")
+    public ResponseEntity<String> reduceStock(@PathVariable Integer id,
+                                       @RequestParam Integer qty){
+        return ResponseEntity.ok(productService.reduceStock(id, qty));
     }
 
     @PostMapping("/createProduct")

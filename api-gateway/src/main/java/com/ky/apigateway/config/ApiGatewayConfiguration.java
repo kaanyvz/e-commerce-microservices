@@ -32,6 +32,9 @@ public class ApiGatewayConfiguration {
                 .route("productService", r ->r.path("/v1/comments/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://productService"))
+                .route("orderService", r ->r.path("/v1/orders/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://oderService"))
                 .build();
     }
 }

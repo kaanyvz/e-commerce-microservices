@@ -7,6 +7,7 @@ import com.ky.orderservice.request.CreateOrderRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,8 +25,8 @@ public class OrderMapper {
                 .id(order.getId())
                 .orderStatus(order.getOrderStatus())
                 .addressDto(orderAddressMapper.orderAddressToOrderAddressDto(order.getOrderAddress()))
-                .customerId(order.getCustomerId())
-                .localDateTime(order.getCreatedDate())
+                .customerMail(order.getCustomerMail())
+                .localDateTime(LocalDateTime.now())
                 .items(order.getOrderItems()
                         .stream()
                         .map(orderItemMapper::orderItemToOrderItemDto)
@@ -35,8 +36,8 @@ public class OrderMapper {
     }
 
     public Order orderReqToOrder(CreateOrderRequest orderRequest){
-        return Order.builder()
-                .customerId((Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+        return Order.orderBuilder()
+                .customerMail((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .orderAddress(orderAddressMapper.orderAddressRequestToOrderAddress(orderRequest.getAddress()))
                 .orderStatus(OrderStatus.PENDING)
                 .orderItems(orderRequest.getItems()
