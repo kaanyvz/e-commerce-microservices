@@ -77,7 +77,7 @@ public class ProductService {
     public ProdDto updateProduct(UpdateProductRequest updateProductRequest, Integer id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(()->{
-                    throw  new RuntimeException("Error while finding product!");
+                    throw  new ProductNotFoundException("Error while finding product!");
                 });
 
         Category category = categoryService.getCategoryById(updateProductRequest.getCategoryId());
@@ -95,19 +95,19 @@ public class ProductService {
 
     public Product getProductById(Integer id){
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Could not found."));
+                .orElseThrow(() -> new ProductNotFoundException("Could not found."));
     }
 
     public ProdDto getProductDtoById(Integer id){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Error"));
+                .orElseThrow(() -> new ProductNotFoundException("Error"));
 
         return productMapper.productConverter(product);
     }
 
     public List<CommentDto> getComments(Integer id){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Error while finding the product..."));
+                .orElseThrow(() -> new ProductNotFoundException("Error while finding the product..."));
         return product.getComments().stream().map(commentMapper::commentConverter).collect(Collectors.toList());
     }
 

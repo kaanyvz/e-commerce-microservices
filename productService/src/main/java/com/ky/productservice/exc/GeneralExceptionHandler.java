@@ -46,6 +46,26 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
         return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(UserNotAuthenticatedException.class)
+    public ResponseEntity<HttpResponse> userNotAuthenticatedException(UserNotAuthenticatedException exception){
+        return createHttpResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<HttpResponse> commentNotFoundException(CommentNotFoundException exception){
+        return createHttpResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<HttpResponse> categoryNotFoundException(CategoryNotFoundException exception){
+        return createHttpResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(CategoryNameNotProvidedException.class)
+    public ResponseEntity<HttpResponse> categoryNameNotProvidedException(CategoryNameNotProvidedException exception){
+        return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
 
     // PRIVATE METHODS //
     private ResponseEntity<HttpResponse> createHttpResponse(HttpStatus httpStatus, String message){

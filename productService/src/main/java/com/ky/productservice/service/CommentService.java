@@ -1,6 +1,8 @@
 package com.ky.productservice.service;
 
 import com.ky.productservice.dto.CommentDto;
+import com.ky.productservice.exc.CommentNotFoundException;
+import com.ky.productservice.exc.UserNotAuthenticatedException;
 import com.ky.productservice.mapper.CommentMapper;
 import com.ky.productservice.model.Comment;
 import com.ky.productservice.model.Product;
@@ -29,12 +31,12 @@ public class CommentService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("User is not authenticated.");
+            throw new UserNotAuthenticatedException("User is not authenticated.");
         }
 
         String username = authentication.getName();
         if (username == null || username.isEmpty()) {
-            throw new IllegalStateException("Username is not available.");
+            throw new UserNotAuthenticatedException("Username is not available.");
         }
 
         Comment comment = Comment.commentBuilder()
@@ -49,7 +51,7 @@ public class CommentService {
 
     public String deleteComment(Integer id){
         Comment comment = commentRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Could not found"));
+                        .orElseThrow(() -> new CommentNotFoundException("Could not found"));
 
         commentRepository.delete(comment);
         return "Comment has successfully deleted.";
