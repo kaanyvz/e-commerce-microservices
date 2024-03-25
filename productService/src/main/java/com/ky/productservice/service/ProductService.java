@@ -2,6 +2,8 @@ package com.ky.productservice.service;
 
 import com.ky.productservice.dto.CommentDto;
 import com.ky.productservice.dto.ProdDto;
+import com.ky.productservice.exc.OutOfStockException;
+import com.ky.productservice.exc.ProductNotFoundException;
 import com.ky.productservice.mapper.CommentMapper;
 import com.ky.productservice.mapper.ProductMapper;
 import com.ky.productservice.model.Category;
@@ -124,15 +126,15 @@ public class ProductService {
 
     public boolean isInStock(Integer productId){
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product cannot find by id."));
+                .orElseThrow(() -> new ProductNotFoundException("Product cannot find by id."));
         return product.getStockCount() > 0;
     }
 
     public String reduceStock(Integer id, Integer qty){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("product could not found"));
+                .orElseThrow(() -> new ProductNotFoundException("product could not found"));
         if(product.getStockCount() < 0){
-            throw new RuntimeException("Insufficient stock for product with id: " + id);
+            throw new OutOfStockException("Insufficient stock for product with id: " + id);
         }
         product.setStockCount(product.getStockCount() - qty);
         productRepository.save(product);

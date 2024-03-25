@@ -29,7 +29,6 @@ public class OrderService {
         this.productServiceClient = productServiceClient;
     }
 
-    //todo - continue to this func. - 03.19
     public OrderDto createOrder(CreateOrderRequest request){
         Order order = orderMapper.orderReqToOrder(request);
         order.getOrderAddress().setOrder(order);
