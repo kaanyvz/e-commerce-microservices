@@ -61,7 +61,7 @@ public class FileService {
 
         fileRepository.save(uploadedFile);
 
-        return "Image has successfully added.";
+        return filePath;
     }
 
     public byte[] downloadImageFromFileSystem(String id) {

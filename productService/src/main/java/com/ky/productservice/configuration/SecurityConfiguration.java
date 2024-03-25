@@ -18,7 +18,7 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter filter;
     private static final String[] WHITE_LIST_URL = {
             "/v1/products/isInStock/**",
-            "/v1/products/reduceStock/**",
+            "/v1/products/reduceStock/**"
     };
 
     public SecurityConfiguration(JwtAuthenticationFilter filter) {

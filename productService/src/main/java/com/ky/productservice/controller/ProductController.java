@@ -8,6 +8,7 @@ import com.ky.productservice.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -48,8 +49,9 @@ public class ProductController {
     }
 
     @PostMapping("/createProduct")
-    public ResponseEntity<ProdDto> createProduct(@RequestBody CreateProductRequest request){
-        return ResponseEntity.ok(productService.createProduct(request));
+    public ResponseEntity<ProdDto> createProduct(@RequestPart CreateProductRequest request,
+                                                 @RequestPart("image") MultipartFile file){
+        return ResponseEntity.ok(productService.createProduct(request, file));
     }
 
     @PutMapping("/updateProduct/{id}")
