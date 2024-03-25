@@ -1,6 +1,8 @@
 package com.ky.productservice.service;
 
 import com.ky.productservice.dto.CategoryDto;
+import com.ky.productservice.exc.CategoryNameNotProvidedException;
+import com.ky.productservice.exc.CategoryNotFoundException;
 import com.ky.productservice.mapper.CategoryMapper;
 import com.ky.productservice.model.Category;
 import com.ky.productservice.repository.CategoryRepository;
@@ -24,12 +26,12 @@ public class CategoryService {
 
     public Category getCategoryById(Integer id){
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Error"));
+                .orElseThrow(() -> new CategoryNotFoundException("Error"));
     }
 
     public CategoryDto createCategory(CreateCategoryRequest request) {
         if (request == null || StringUtils.isBlank(request.getCategoryName())) {
-            throw new IllegalArgumentException("Category name is required.");
+            throw new CategoryNameNotProvidedException("Category name is required.");
         }
 
         String categoryName = request.getCategoryName().toLowerCase();
@@ -37,7 +39,7 @@ public class CategoryService {
         // Check if the entered category already exists (case-insensitive)
         Optional<Category> existingCategory = categoryRepository.findByNameIgnoreCase(categoryName);
         if (existingCategory.isPresent()) {
-            throw new IllegalArgumentException("Category '" + categoryName + "' already exists.");
+            throw new CategoryNameNotProvidedException("Category '" + categoryName + "' already exists.");
         }
 
         Category category = Category.builder()

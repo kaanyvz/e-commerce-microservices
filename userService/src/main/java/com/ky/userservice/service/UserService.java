@@ -6,7 +6,10 @@ import com.ky.userservice.dto.Me;
 import com.ky.userservice.dto.UserCredential;
 import com.ky.userservice.dto.UserDto;
 import com.ky.userservice.enumeration.Role;
+import com.ky.userservice.exc.EmailDuplicationError;
+import com.ky.userservice.exc.FileNotFoundException;
 import com.ky.userservice.exc.PasswordMatchException;
+import com.ky.userservice.exc.UserNotFoundException;
 import com.ky.userservice.mapper.UserMapper;
 import com.ky.userservice.model.File;
 import com.ky.userservice.model.User;
@@ -109,7 +112,7 @@ public class UserService {
     public UserDto updateUser(UpdateUserRequest request){
         User user = userRepository.findUserByEmail(request.getEmail());
         if (user == null) {
-            throw new RuntimeException("User not found with email: " + request.getEmail());
+            throw new UserNotFoundException("User not found with email: " + request.getEmail());
         }
         if (request.getFirstName() != null) {
             user.setFirstName(request.getFirstName());
@@ -176,7 +179,7 @@ public class UserService {
     //PP METHODS
     protected File findFileById(String id){
         return fileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Could not found by id.."));
+                .orElseThrow(() -> new UserNotFoundException("Could not found by id.."));
     }
 
     @PostConstruct
@@ -233,7 +236,7 @@ public class UserService {
     public String deleteImage(String id){
         File file = findFileById(id);
         if(file == null){
-            throw new RuntimeException("File could not found by id: " + id);
+            throw new FileNotFoundException("File could not found by id: " + id);
         }
         try {
             Files.deleteIfExists(Paths.get(file.getFilePath()));
@@ -256,7 +259,7 @@ public class UserService {
     private void isEmailAlreadyExists(String email){
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isPresent()){
-            throw new RuntimeException("This email already exists!");
+            throw new EmailDuplicationError("This email already exists!");
         }
     }
 
