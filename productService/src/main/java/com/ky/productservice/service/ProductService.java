@@ -1,5 +1,6 @@
 package com.ky.productservice.service;
 
+import com.ky.productservice.client.DocumentServiceClient;
 import com.ky.productservice.dto.CommentDto;
 import com.ky.productservice.dto.ProdDto;
 import com.ky.productservice.exc.OutOfStockException;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +38,7 @@ public class ProductService {
     private final ElasticRepository elasticRepository;
     private final MessageProducer messageProducer;
     private final ElasticsearchOperations elasticsearchOperations;
+    private final DocumentServiceClient documentServiceClient;
     private final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     public ProductService(ProductRepository productRepository,
@@ -44,7 +47,7 @@ public class ProductService {
                           CategoryService categoryService,
                           ElasticRepository elasticRepository,
                           MessageProducer messageProducer,
-                          ElasticsearchOperations elasticsearchOperations) {
+                          ElasticsearchOperations elasticsearchOperations, DocumentServiceClient documentServiceClient) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.commentMapper = commentMapper;
@@ -52,27 +55,28 @@ public class ProductService {
         this.elasticRepository = elasticRepository;
         this.messageProducer = messageProducer;
         this.elasticsearchOperations = elasticsearchOperations;
+        this.documentServiceClient = documentServiceClient;
     }
 
 
     @Transactional
-    public ProdDto createProduct(CreateProductRequest request){
+    public ProdDto createProduct(CreateProductRequest request, MultipartFile file){
+        String imageUrl = documentServiceClient.uploadImageToFIleSystem(file).getBody();
         Category category = categoryService.getCategoryById(request.getCategoryId());
         Product product = Product.productBuilder()
                 .name(request.getName())
                 .category(category)
                 .unitPrice(request.getPrice())
-                .imageUrl(request.getImageUrl())
                 .description(request.getDesc())
                 .comments(new ArrayList<>())
                 .stockCount(request.getStockCount())
+                .imageUrl(imageUrl)
                 .build();
         product.setCreatedDate(LocalDateTime.now());
         Product savedProduct = productRepository.save(product);
         saveProdInElasticsearch(savedProduct);
         return productMapper.productConverter(savedProduct);
     }
-
 
     public ProdDto updateProduct(UpdateProductRequest updateProductRequest, Integer id) {
         Product product = productRepository.findById(id)

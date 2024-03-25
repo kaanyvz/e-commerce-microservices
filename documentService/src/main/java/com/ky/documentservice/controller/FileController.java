@@ -15,7 +15,7 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImageToFIleSystem(@RequestPart("image") MultipartFile file) {
         return ResponseEntity.ok().body(fileService.uploadImgToTheSystem(file));
     }
