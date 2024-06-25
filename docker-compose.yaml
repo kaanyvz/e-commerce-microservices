@@ -38,3 +38,12 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+
+  eureka-service:
+    build:
+        context: ./eurekaService
+        dockerfile: Dockerfile
+    container_name: eurekaservice
+    ports:
+      - "8761:8761"
+

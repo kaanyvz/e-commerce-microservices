@@ -4,18 +4,61 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.2</version>
+    </parent>
+
+    <groupId>com.ky</groupId>
     <artifactId>e-commerce-microservices</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>eurekaService</module>
+        <module>rabbitService</module>
+        <module>userService</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+
+
+
+            <dependency>
+                <groupId>com.ky</groupId>
+                <artifactId>eurekaService</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ky</groupId>
+                <artifactId>rabbitService</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.ky</groupId>
+                <artifactId>userService</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven-complier-plugin.version>3.11.0</maven-complier-plugin.version>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-complier-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

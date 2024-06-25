@@ -14,11 +14,7 @@ import com.ky.productservice.repository.ElasticRepository;
 import com.ky.productservice.repository.ProductRepository;
 import com.ky.productservice.request.create.CreateProductRequest;
 import com.ky.productservice.request.update.UpdateProductRequest;
-import com.ky.rabbitservice.producer.MessageProducer;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,25 +32,19 @@ public class ProductService {
     private final CommentMapper commentMapper;
     private final CategoryService categoryService;
     private final ElasticRepository elasticRepository;
-    private final MessageProducer messageProducer;
-    private final ElasticsearchOperations elasticsearchOperations;
     private final DocumentServiceClient documentServiceClient;
-    private final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     public ProductService(ProductRepository productRepository,
                           ProductMapper productMapper,
                           CommentMapper commentMapper,
                           CategoryService categoryService,
                           ElasticRepository elasticRepository,
-                          MessageProducer messageProducer,
-                          ElasticsearchOperations elasticsearchOperations, DocumentServiceClient documentServiceClient) {
+                          DocumentServiceClient documentServiceClient) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.commentMapper = commentMapper;
         this.categoryService = categoryService;
         this.elasticRepository = elasticRepository;
-        this.messageProducer = messageProducer;
-        this.elasticsearchOperations = elasticsearchOperations;
         this.documentServiceClient = documentServiceClient;
     }
 
@@ -78,6 +68,11 @@ public class ProductService {
         return productMapper.productConverter(savedProduct);
     }
 
+
+    public void s(){
+
+    }
+    
     public ProdDto updateProduct(UpdateProductRequest updateProductRequest, Integer id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(()->{
@@ -119,7 +114,7 @@ public class ProductService {
     @Transactional
     public String deleteProduct(Integer id) {
         productRepository.deleteById(id);
-        elasticRepository.deleteById(id);;
+        elasticRepository.deleteById(id);
         return "Product has deleted successfully.";
     }
 
